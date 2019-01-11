@@ -1,5 +1,7 @@
 """Init for the Dream Team Flask app."""
 
+import os
+
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -14,9 +16,16 @@ login_manager = LoginManager()
 
 def create_app(config_name):
     """Create the app based on a supplied config."""
-    app = Flask(__name__, instance_relative_config=True)
-    app.config.from_object(app_config[config_name])
-    app.config.from_pyfile('config.py')
+    if os.environ.get('FLASK_CONFIG') == 'production':
+        app = Flask(__name__)
+        app.config.update(
+            SECRET_KEY=os.environ.get('SECRET_KEY'),
+            SQLALCHEMY_DATABASE_URI=os.environ.get('SQLALCHEMY_DATABASE_URI')
+        )
+    else:
+        app = Flask(__name__, instance_relative_config=True)
+        app.config.from_object(app_config[config_name])
+        app.config.from_pyfile('config.py')
 
     Bootstrap(app)
     db.init_app(app)
