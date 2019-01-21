@@ -24,19 +24,19 @@
                     <ul class="navbar-nav ml-auto">
                         {% if current_user.is_authenticated %}
                             {% if current_user.is_admin %}
-                                <li class="nav-item"><a href="{{ url_for('home.admin_dashboard') }}" class="nav-link">Dashboard</a></li>
-                                <li class="nav-item"><a href="{{ url_for('admin.list_departments') }}" class="nav-link">Departments</a></li>
-                                <li class="nav-item"><a href="{{ url_for('admin.list_roles') }}" class="nav-link">Roles</a></li>
-                                <li class="nav-item"><a href="{{ url_for('admin.list_employees') }}" class="nav-link">Employees</a></li>
+                                <li id="dashboard_link_admin" class="nav-item"><a href="{{ url_for('home.admin_dashboard') }}" class="nav-link">Dashboard</a></li>
+                                <li id="departments_link" class="nav-item"><a href="{{ url_for('admin.list_departments') }}" class="nav-link">Departments</a></li>
+                                <li id="roles_link" class="nav-item"><a href="{{ url_for('admin.list_roles') }}" class="nav-link">Roles</a></li>
+                                <li id="employees_link" class="nav-item"><a href="{{ url_for('admin.list_employees') }}" class="nav-link">Employees</a></li>
                             {% else %}
-                                <li class="nav-item"><a class="nav-link" href="{{ url_for('home.dashboard') }}">Dashboard</a></li>
+                                <li id="dashboard_link_employee" class="nav-item"><a class="nav-link" href="{{ url_for('home.dashboard') }}">Dashboard</a></li>
                             {% endif %}
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
-                            <li class="nav-item"><a class="nav-link"><i class="fa fa-user"></i>&nbsp;Hi, {{ current_user.username }}!</a></li>                            
+                            <li id="logout_link" class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
+                            <li id ="username_greeting" class="nav-item"><a class="nav-link"><i class="fa fa-user"></i>&nbsp;Hi, {{ current_user.username }}!</a></li>                            
                         {% else %}
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('home.homepage') }}">Home</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">Register</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
+                            <li id="home_link" class="nav-item"><a class="nav-link" href="{{ url_for('home.homepage') }}">Home</a></li>
+                            <li id="register_link" class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">Register</a></li>
+                            <li id="login_link" class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
                         {% endif %}
                     </ul>
                 </div>

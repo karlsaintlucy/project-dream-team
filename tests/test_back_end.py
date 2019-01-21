@@ -1,7 +1,4 @@
-"""Tests for the Dream Team Flask app."""
-
-
-import os
+"""Back end tests for Dream Team."""
 
 import unittest
 
@@ -13,39 +10,48 @@ from app.models import Department, Employee, Role
 
 
 class TestBase(TestCase):
+    """Base test class."""
 
     def create_app(self):
-
+        """Create app with test configuration."""
         config_name = 'testing'
         app = create_app(config_name)
         app.config.update(
-            SQLALCHEMY_DATABASE_URI='mysql+pymysql://dt_admin:dt2019@localhost/dreamteam_test'
+            SQLALCHEMY_DATABASE_URI='mysql+pymysql://'
+                                    'dt_admin:dt2019@localhost/'
+                                    'dreamteam_test'
         )
         return app
 
     def setUp(self):
-        """Will be called before every test."""
-
+        """Set up the testing environment."""
+        db.session.commit()
+        db.drop_all()
         db.create_all()
 
-        # create test admin user
-        admin = Employee(username='admin', password='admin2019', is_admin=True)
+        admin = Employee(
+            username='admin',
+            password='admin2019',
+            is_admin=True
+        )
 
-        # create test non-admin user
-        employee = Employee(username='test_user', password='test2019')
+        employee = Employee(
+            username='test_user',
+            password='test2019'
+        )
 
         db.session.add(admin)
         db.session.add(employee)
         db.session.commit()
 
     def tearDown(self):
-        """Will be called after every test."""
-
+        """Tear down the test environment."""
         db.session.remove()
         db.drop_all()
 
 
 class TestModels(TestBase):
+    """Test the app's models."""
 
     def test_employee_model(self):
         """Test number of records in Employee table."""
@@ -53,7 +59,10 @@ class TestModels(TestBase):
 
     def test_department_model(self):
         """Test number of records in Department table."""
-        department = Department(name='IT', description='The IT Department')
+        department = Department(
+            name='IT',
+            description='The IT Department'
+        )
 
         db.session.add(department)
         db.session.commit()
@@ -62,7 +71,10 @@ class TestModels(TestBase):
 
     def test_role_model(self):
         """Test number of records in Role table."""
-        role = Role(name='CEO', description='Run the whole company')
+        role = Role(
+            name='CEO',
+            description='Run the whole company'
+        )
 
         db.session.add(role)
         db.session.commit()
@@ -71,6 +83,7 @@ class TestModels(TestBase):
 
 
 class TestViews(TestBase):
+    """Test the app's views."""
 
     def test_homepage_view(self):
         """Test that the homepage is accessible without login."""
@@ -78,7 +91,7 @@ class TestViews(TestBase):
         self.assertEqual(response.status_code, 200)
 
     def test_login_view(self):
-        """Test that the login page is accessible without login."""
+        """Test that login page is accessible without login."""
         response = self.client.get(url_for('auth.login'))
         self.assertEqual(response.status_code, 200)
 
@@ -101,8 +114,8 @@ class TestViews(TestBase):
         self.assertRedirects(response, redirect_url)
 
     def test_admin_dashboard_view(self):
-        """Test that admin dashboard is inaccessible without login
-           and redirects to login page then to dashboard."""
+        """Test that dashboard is inaccessible without login
+           and redirects to loin page then to dashboard."""
         target_url = url_for('home.admin_dashboard')
         redirect_url = url_for('auth.login', next=target_url)
         response = self.client.get(target_url)
@@ -111,7 +124,7 @@ class TestViews(TestBase):
 
     def test_departments_view(self):
         """Test that departments page is inaccessible without login
-           and redirects to login page then to departments."""
+           and redirects to login page then to department."""
         target_url = url_for('admin.list_departments')
         redirect_url = url_for('auth.login', next=target_url)
         response = self.client.get(target_url)
@@ -120,7 +133,7 @@ class TestViews(TestBase):
 
     def test_roles_view(self):
         """Test that roles page is inaccessible without login
-           and redirects to login page then to roles."""
+           and redirects to login page then to roles page."""
         target_url = url_for('admin.list_roles')
         redirect_url = url_for('auth.login', next=target_url)
         response = self.client.get(target_url)
@@ -129,7 +142,7 @@ class TestViews(TestBase):
 
     def test_employees_view(self):
         """Test that employees page is inaccessible without login
-           and redirects to login page then to employees."""
+           and redirects to login page then to employees page."""
         target_url = url_for('admin.list_employees')
         redirect_url = url_for('auth.login', next=target_url)
         response = self.client.get(target_url)
@@ -138,29 +151,33 @@ class TestViews(TestBase):
 
 
 class TestErrorPages(TestBase):
+    """Test the error pages."""
 
     def test_403_forbidden(self):
+        """Test the 403: Forbidden view."""
         @self.app.route('/403')
         def forbidden_error():
             abort(403)
 
         response = self.client.get('/403')
         self.assertEqual(response.status_code, 403)
-        self.assertTrue('403 Error' in str(response.data))
+        self.assertTrue(b'403 Error' in response.data)
 
     def test_404_not_found(self):
+        """Test 404: Not Found view."""
         response = self.client.get('/nothinghere')
         self.assertEqual(response.status_code, 404)
-        self.assertTrue('404 Error' in str(response.data))
+        self.assertTrue(b'404 Error' in response.data)
 
     def test_500_internal_server_error(self):
+        """Test 500: Internal Server Error view."""
         @self.app.route('/500')
         def internal_server_error():
             abort(500)
 
         response = self.client.get('/500')
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('500 Error' in str(response.data))
+        self.assertTrue(b'500 Error' in response.data)
 
 
 if __name__ == '__main__':

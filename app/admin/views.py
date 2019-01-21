@@ -45,6 +45,7 @@ def add_department():
             db.session.commit()
             flash('You have successfully added a new department.')
         except:
+            db.session.rollback()
             flash('Error: Department name already exists.')
 
         return redirect(url_for('admin.list_departments'))
@@ -116,7 +117,7 @@ def list_roles():
 @login_required
 def add_role():
     """Add a role to the database."""
-    check_admin
+    check_admin()
 
     add_role = True
 
@@ -129,6 +130,7 @@ def add_role():
             db.session.commit()
             flash('You have successfully added a new role.')
         except:
+            db.session.rollback()
             flash('Error: Role name already exists.')
 
         return redirect(url_for('admin.list_roles'))
@@ -158,7 +160,7 @@ def edit_role(id):
 
         return redirect(url_for('admin.list_roles'))
 
-    form.decription.data = role.description
+    form.description.data = role.description
     form.name.data = role.name
     return render_template('admin/roles/role.html',
                            add_role=add_role,
